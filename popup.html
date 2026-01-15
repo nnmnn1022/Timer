@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+<title>ECTimer</title>
+</head>
+<body>
+  <div class="backgroundfield">
+    <!-- 타이머 제어 영역 -->
+    <div class="timer-control-area">
+      <div class="timer-display">0:00:00</div>
+      <div class="title-input-area">
+        <input type="text" id="titleInput" placeholder="작업 내용을 입력하세요">
+        <div class="timer-buttons">
+          <button id="startPauseBtn" class="start-pause-btn">
+            <img class="btn-icon" src="images/icons8-play-20.png" alt="play">
+          </button>
+          <button id="completeBtn">완료</button>
+        </div>
+      </div>
+      <div class="memo-input-area">
+        <textarea id="memoInput" placeholder="메모를 입력하세요"></textarea>
+      </div>
+      <div class="complete-area">
+        <div class="auto-start-checkbox-area">
+          <input type="checkbox" id="autoStartCheckbox">
+          <label for="autoStartCheckbox">다음 타이머 자동 시작</label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 저장 내역 영역 -->
+    <div class="history-area">
+      <div class="history-toggle collapsed" id="historyToggle">
+        <span class="toggle-text">내역</span>
+        <span class="toggle-arrow">▼</span>
+      </div>
+      <div class="history-content collapsed" id="historyContent">
+        <div class="history-list" id="historyList">
+          <!-- 저장된 내역이 여기에 표시됩니다 -->
+        </div>
+        <button id="clearAllBtn" class="clear-all-btn">전체삭제</button>
+      </div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
