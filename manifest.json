@@ -1,5 +1,5 @@
 {
-    "name": "ECTimer",
+    "name": "Timer",
     "description": "업무 시간 관리를 위한 타이머",
     "version": "1.0",
     "manifest_version": 3,
@@ -16,7 +16,11 @@
       "service_worker": "background.js"
     },
     "action": {
-      "default_popup": "popup.html"
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/clock_16.png.png",
+        "48": "images/clock_48.png.png"
+      }
     },
     "content_scripts": [
       {

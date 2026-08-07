@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="style.css">
-<title>ECTimer</title>
+<title>Timer</title>
 </head>
 <body>
   <div class="backgroundfield">
@@ -11,10 +11,14 @@
     <div class="timer-control-area">
       <div class="timer-display">0:00:00</div>
       <div class="title-input-area">
-        <input type="text" id="titleInput" placeholder="작업 내용을 입력하세요">
+        <div class="work-input-grid">
+          <input type="text" id="taskNumberInput" placeholder="작업번호">
+          <input type="text" id="devNumberInput" placeholder="개발번호">
+          <input type="text" id="jobNameInput" placeholder="잡명">
+        </div>
         <div class="timer-buttons">
           <button id="startPauseBtn" class="start-pause-btn">
-            <img class="btn-icon" src="images/icons8-play-20.png" alt="play">
+            <img class="btn-icon" src="images/play.svg" alt="play">
           </button>
           <button id="completeBtn">완료</button>
         </div>

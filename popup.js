@@ -214,6 +214,22 @@ function initializeApp() {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}.${month}.${day}`;
     }
+
+    function formatDateHeaderText(dateKey) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        if (dateKey === formatDateKey(today.getTime())) {
+            return `오늘 · ${dateKey}`;
+        }
+        if (dateKey === formatDateKey(yesterday.getTime())) {
+            return `어제 · ${dateKey}`;
+        }
+        return dateKey;
+    }
     
     // Chrome Storage API 사용 가능 여부 확인
     function isStorageAvailable() {
@@ -485,7 +501,39 @@ function initializeApp() {
     
     // 완료 버튼 클릭 이벤트
     const completeBtn = document.getElementById('completeBtn');
-    const titleInput = document.getElementById('titleInput');
+    const taskNumberInput = document.getElementById('taskNumberInput');
+    const devNumberInput = document.getElementById('devNumberInput');
+    const jobNameInput = document.getElementById('jobNameInput');
+    const titleInput = {
+        get value() {
+            return jobNameInput ? jobNameInput.value : '';
+        },
+        set value(value) {
+            if (taskNumberInput && devNumberInput && jobNameInput && !value) {
+                taskNumberInput.value = '';
+                devNumberInput.value = '';
+                jobNameInput.value = '';
+                return;
+            }
+            if (jobNameInput) {
+                jobNameInput.value = value || '';
+            }
+        },
+        addEventListener(eventName, handler) {
+            [taskNumberInput, devNumberInput, jobNameInput].forEach(function(input) {
+                if (input) {
+                    input.addEventListener(eventName, handler);
+                }
+            });
+        },
+        blur() {
+            [taskNumberInput, devNumberInput, jobNameInput].forEach(function(input) {
+                if (input) {
+                    input.blur();
+                }
+            });
+        }
+    };
     const memoInput = document.getElementById('memoInput');
     const autoStartCheckbox = document.getElementById('autoStartCheckbox');
     
@@ -1238,7 +1286,7 @@ function initializeApp() {
                     const activeDateHeader = document.createElement('div');
                     activeDateHeader.className = 'history-date-header';
                     activeDateHeader.innerHTML = `
-                        <span class="date-header-text">${activeDateKey}</span>
+                        <span class="date-header-text">${formatDateHeaderText(activeDateKey)}</span>
                         <div class="date-header-checkbox">
                             <input type="checkbox" id="minuteDisplayCheckbox">
                             <label for="minuteDisplayCheckbox">분단위 환산</label>
@@ -1393,7 +1441,7 @@ function initializeApp() {
                         if (isFirstDate) {
                             isFirstDate = false;
                             dateHeader.innerHTML = `
-                                <span class="date-header-text">${dateKey}</span>
+                                <span class="date-header-text">${formatDateHeaderText(dateKey)}</span>
                                 <div class="date-header-checkbox">
                                     <input type="checkbox" id="minuteDisplayCheckbox">
                                     <label for="minuteDisplayCheckbox">분단위 환산</label>
@@ -1409,7 +1457,7 @@ function initializeApp() {
                                 loadHistory(); // 내역 다시 로드하여 표시 형식 변경
                             });
                         } else {
-                            dateHeader.textContent = dateKey;
+                            dateHeader.innerHTML = `<span class="date-header-text">${formatDateHeaderText(dateKey)}</span>`;
                         }
                         
                         historyList.appendChild(dateHeader);
@@ -1683,11 +1731,21 @@ function initializeApp() {
                 }
                 
                 // 4. 완료된 항목들 렌더링
+                let completedDateKey = null;
                 completedEntries.forEach(function(completedEntry) {
                     const completedEntryTimestamp = completedEntry.endTime || completedEntry.timestamp;
+                    const entryDateKey = formatDateKey(completedEntryTimestamp);
                     const completedTitle = completedEntry.title || '(title 없음)';
                     const completedIsCompleted = completedEntry.completed || false;
                     const completedMemo = completedEntry.memo || '';
+
+                    if (entryDateKey !== completedDateKey) {
+                        completedDateKey = entryDateKey;
+                        const completedDateHeader = document.createElement('div');
+                        completedDateHeader.className = 'history-date-header';
+                        completedDateHeader.innerHTML = `<span class="date-header-text">${formatDateHeaderText(entryDateKey)}</span>`;
+                        historyList.appendChild(completedDateHeader);
+                    }
                     
                     const completedHistoryItem = document.createElement('div');
                     completedHistoryItem.className = 'history-item';

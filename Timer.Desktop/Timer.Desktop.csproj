@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Timer.Desktop</AssemblyName>
+    <RootNamespace>TimerDesktop</RootNamespace>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <OutputPath>$(MSBuildProjectDirectory)\bin\Release\net8.0-windows\</OutputPath>
+    <PublishDir>$(MSBuildProjectDirectory)\bin\Release\net8.0-windows\</PublishDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\images\clock_48.png.png" LogicalName="TimerDesktop.clock.png" />
+  </ItemGroup>
+</Project>

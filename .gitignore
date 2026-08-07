@@ -11,6 +11,9 @@ desktop.ini
 # Editor files
 .vscode/
 .idea/
+.codex/
+docs/
+*.lnk
 *.swp
 *.swo
 *~
@@ -22,6 +25,12 @@ npm-debug.log*
 # Node modules (if using build tools)
 node_modules/
 package-lock.json
+
+# .NET
+bin/
+obj/
+publish/
+.dotnet-home/
 
 # Temporary files
 *.tmp

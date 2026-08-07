@@ -1,5 +1,5 @@
 * { 
-    font-family: Arial, sans-serif;
+    font-family: Arial, "Malgun Gothic", sans-serif;
     font-size: 12px;
     margin: 0;
     padding: 0;
@@ -7,17 +7,22 @@
 }
 
 .backgroundfield {
-    border-radius: 5px;
-    background-color: #f2f2f2;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #f8fbff 0%, #edf3f7 100%);
     padding: 20px;
     width: 380px;
     min-height: 180px;
+    color: #24313f;
 }
 
 /* 타이머 제어 영역 */
 .timer-control-area {
     margin-top: 10px;
     margin-bottom: 15px;
+    padding: 14px;
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 12px 30px rgba(54, 78, 103, 0.12);
 }
 
 .timer-display {
@@ -25,7 +30,7 @@
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
-    color: #333;
+    color: #1f3349;
 }
 
 .timer-buttons {
@@ -37,16 +42,17 @@
 .timer-buttons button {
     padding: 5px 10px;
     border: none;
-    border-radius: 3px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 11px;
-    background-color: #4CAF50;
+    background-color: #2f9d84;
     color: white;
+    box-shadow: 0 6px 14px rgba(47, 157, 132, 0.24);
 }
 
 .start-pause-btn {
     padding: 8px 8px;
-    background-color: #4CAF50;
+    background-color: #2f9d84;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,7 +60,7 @@
 }
 
 .start-pause-btn.paused {
-    background-color: #ff9800;
+    background-color: #e79042;
 }
 
 .btn-icon {
@@ -70,29 +76,43 @@
     margin-top: 10px;
     display: flex;
     gap: 5px;
-    align-items: center;
+    align-items: stretch;
+}
+
+.work-input-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.work-input-grid input:last-child {
+    grid-column: 1 / -1;
 }
 
 .title-input-area input {
-    flex: 1;
-    padding: 6px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    min-width: 0;
+    padding: 8px 9px;
+    border: 1px solid #d7e1e8;
+    border-radius: 10px;
     font-size: 12px;
+    background-color: #fbfdff;
+    color: #24313f;
 }
 
 .title-input-area input:hover {
-    border-color: #ddd;
+    border-color: #b9cbd8;
 }
 
 .title-input-area input:focus {
-    border-color: #ddd;
+    border-color: #5aa7c8;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(90, 167, 200, 0.16);
 }
 
-.timer-control-area.timer-running #titleInput,
-.timer-control-area.playing-history #titleInput {
-    background-color: #e8f5e9;
+.timer-control-area.timer-running .work-input-grid input,
+.timer-control-area.playing-history .work-input-grid input {
+    background-color: #eef8f5;
 }
 
 .memo-input-area {
@@ -101,28 +121,31 @@
 
 .memo-input-area textarea {
     width: 100%;
-    padding: 6px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    padding: 8px 9px;
+    border: 1px solid #d7e1e8;
+    border-radius: 10px;
     font-size: 12px;
     font-family: Arial, sans-serif;
     resize: vertical;
     min-height: 60px;
     max-height: 120px;
+    background-color: #fbfdff;
+    color: #24313f;
 }
 
 .memo-input-area textarea:hover {
-    border-color: #ddd;
+    border-color: #b9cbd8;
 }
 
 .memo-input-area textarea:focus {
-    border-color: #ddd;
+    border-color: #5aa7c8;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(90, 167, 200, 0.16);
 }
 
 .timer-control-area.timer-running #memoInput,
 .timer-control-area.playing-history #memoInput {
-    background-color: #e8f5e9;
+    background-color: #eef8f5;
 }
 
 .complete-area {
@@ -135,10 +158,10 @@
 .timer-buttons button#completeBtn {
     padding: 8px 10px;
     border: none;
-    border-radius: 3px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 11px;
-    background-color: #4ba3d6;
+    background-color: #4d8fbd;
     color: white;
     flex-shrink: 0;
 }
@@ -173,15 +196,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px;
-    background-color: #e0e0e0;
-    border-radius: 3px;
+    background-color: #dfeaf1;
+    border-radius: 12px;
     cursor: pointer;
     user-select: none;
     transition: background-color 0.3s;
 }
 
 .history-toggle:hover {
-    background-color: #d0d0d0;
+    background-color: #d3e1ea;
 }
 
 .toggle-text {
@@ -249,11 +272,14 @@
 .history-date-header {
     font-weight: bold;
     font-size: 12px;
-    color: #333;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
+    color: #1f3349;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    background-color: #d9e9f1;
+    border-left: 4px solid #2f9d84;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(54, 78, 103, 0.08);
     text-align: left;
     display: flex;
     justify-content: space-between;
@@ -271,6 +297,39 @@
     flex-shrink: 0;
 }
 
+.date-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.date-copy-btn {
+    width: 24px;
+    height: 22px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    color: #3f6573;
+    background-color: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 3px 8px rgba(63, 101, 115, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.date-copy-btn:hover {
+    color: #ffffff;
+    background-color: #2f9d84;
+}
+
+.date-copy-btn2 {
+    font-weight: 700;
+    color: #5b5f74;
+}
+
 .date-header-checkbox input[type="checkbox"] {
     cursor: pointer;
     width: 14px;
@@ -286,15 +345,15 @@
 }
 
 .history-date-header:first-child {
-    margin-top: 0;
+    margin-top: 2px;
 }
 
 .history-item {
     position: relative;
     padding: 8px 8px 8px 0;
     margin: 5px 0;
-    background-color: white;
-    border-radius: 0 3px 3px 0;
+    background-color: rgba(255, 255, 255, 0.92);
+    border-radius: 0 12px 12px 0;
     font-size: 11px;
     display: grid;
     grid-template-columns: 8px 4fr 1fr;
@@ -305,8 +364,8 @@
 .history-drag-handle {
     grid-column: 1;
     grid-row: 1 / -1;
-    background-color: #4CAF50;
-    border-radius: 3px 0 0 3px;
+    background-color: #2f9d84;
+    border-radius: 8px 0 0 8px;
     cursor: default;
     user-select: none;
     transition: background-color 0.2s;
@@ -319,12 +378,12 @@
 
 .history-drag-handle:active {
     cursor: default;
-    background-color: #45a049;
+    background-color: #287f6d;
 }
 
 .history-item.active .history-drag-handle {
     cursor: default;
-    background-color: #4CAF50;
+    background-color: #2f9d84;
     opacity: 0.8;
 }
 
@@ -337,11 +396,11 @@
 }
 
 .history-item.active {
-    background-color: #e8f5e9;
+    background-color: #e8f6f2;
 }
 
 .history-item.completed {
-    background-color: #e0e0e0;
+    background-color: #e7ebef;
 }
 
 .history-item.completed:hover .history-play-btn {
@@ -460,6 +519,7 @@
 }
 
 .history-edit-mode .history-title-text,
+.history-edit-mode .history-work-meta,
 .history-edit-mode .history-title-time,
 .history-edit-mode .history-time,
 .history-edit-mode .history-memo,
@@ -479,27 +539,36 @@
 }
 
 .history-edit-mode .history-title-wrapper {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
     margin-left: 5px;
 }
 
+.history-edit-mode .history-title-main {
+    display: none;
+}
+
+.history-edit-mode .history-task-edit-input,
+.history-edit-mode .history-dev-edit-input,
+.history-edit-mode .history-job-edit-input,
 .history-edit-mode .history-edit-input {
     display: block;
     width: 100%;
-    padding: 3px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    padding: 6px 8px;
+    border: 1px solid #d7e1e8;
+    border-radius: 9px;
     font-size: 12px;
+    background-color: #fbfdff;
 }
 
 .history-edit-mode .history-memo-edit-input {
     display: block !important;
     width: 100%;
-    padding: 3px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    padding: 6px 8px;
+    border: 1px solid #d7e1e8;
+    border-radius: 9px;
     font-size: 12px;
     font-family: Arial, sans-serif;
     resize: vertical;
@@ -510,9 +579,9 @@
 .history-edit-mode .history-time-edit-input {
     display: block !important;
     width: 100%;
-    padding: 3px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    padding: 6px 8px;
+    border: 1px solid #d7e1e8;
+    border-radius: 9px;
     font-size: 12px;
 }
 
@@ -520,6 +589,9 @@
     display: none;
 }
 
+.history-task-edit-input,
+.history-dev-edit-input,
+.history-job-edit-input,
 .history-edit-input {
     display: none;
 }
@@ -568,7 +640,8 @@
 .history-title-wrapper {
     grid-column: 2;
     grid-row: 1;
-    display: flex;
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr);
     align-items: flex-start;
     gap: 4px;
     color: #666;
@@ -583,12 +656,29 @@
 }
 
 .history-title-text {
-    flex: 1;
+    grid-column: 2;
     min-width: 0;
     word-wrap: break-word;
     overflow-wrap: break-word;
     font-weight: bold;
     color: #000;
+    line-height: 1.25;
+}
+
+.history-work-meta {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 10px;
+    color: #6c7d8d;
+    line-height: 1.2;
+}
+
+.history-title-main {
+    grid-column: 2;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .history-title-time {
@@ -608,12 +698,11 @@
 .clear-all-btn {
     padding: 5px 10px;
     border: none;
-    border-radius: 3px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 11px;
-    background-color: #f44336;
+    background-color: #d95858;
     color: white;
     float: right;
     clear: both;
 }
-
