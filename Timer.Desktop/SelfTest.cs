@@ -9,6 +9,7 @@ internal static class SelfTest
         try
         {
             TimerTransitions();
+            AsyncDraftSave();
             HistoryTransitions();
             LoadAndStore();
             TsvGolden();
@@ -67,6 +68,33 @@ internal static class SelfTest
         invalid.Timer.StartedAtUtc = now;
         Assert(StateStore.NormalizeLoadedState(invalid), "load reports paused repair");
         Assert(invalid.Timer.StartedAtUtc is null, "load clears paused start");
+    }
+
+    private static void AsyncDraftSave()
+    {
+        var now = new DateTimeOffset(2026, 7, 31, 0, 0, 0, TimeSpan.Zero);
+        var store = new CountingStore();
+        var engine = new TimerEngine(AppState.CreateDefault(), store);
+        var first = engine.SaveDraftAsync(
+            new DraftState { Memo = "first" },
+            new SettingsState());
+        var second = engine.SaveDraftAsync(
+            new DraftState { Memo = "second" },
+            new SettingsState());
+
+        Assert(first.GetAwaiter().GetResult(), "async draft save succeeds");
+        Assert(second.GetAwaiter().GetResult(), "queued draft save succeeds");
+        Assert(engine.Current.Draft.Memo == "second", "queued draft saves preserve latest input");
+        Assert(engine.Start(now), "sync command flushes pending draft save");
+        Assert(engine.Current.Timer.IsRunning && engine.Current.Draft.Memo == "second",
+            "sync command sees latest draft");
+
+        var failedEngine = new TimerEngine(AppState.CreateDefault(), new FailingStore());
+        var failed = failedEngine.SaveDraftAsync(
+            new DraftState { Memo = "must rollback" },
+            new SettingsState()).GetAwaiter().GetResult();
+        Assert(!failed, "async draft save reports failure");
+        Assert(failedEngine.Current.Draft.Memo == "", "async draft save rolls back on failure");
     }
 
     private static void HistoryTransitions()

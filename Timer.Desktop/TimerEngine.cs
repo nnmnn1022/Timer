@@ -3,6 +3,8 @@ namespace TimerDesktop;
 internal sealed class TimerEngine
 {
     private readonly IStateStore _store;
+    private readonly object _sync = new();
+    private Task<bool> _pendingSave = Task.FromResult(true);
 
     public TimerEngine(AppState initialState, IStateStore store)
     {
@@ -139,7 +141,42 @@ internal sealed class TimerEngine
         candidate.Draft = normalized;
         candidate.Settings = settings.Clone();
         return changed || force;
-    });
+    }, cloneHistory: false);
+
+    public Task<bool> SaveDraftAsync(DraftState draft, SettingsState settings, bool force = false)
+    {
+        lock (_sync)
+        {
+            LastError = null;
+            var previous = Current;
+            var candidate = Current.Clone(cloneHistory: false);
+            var normalized = draft.Clone();
+            normalized.Normalize();
+            var changed =
+                !DraftEquals(candidate.Draft, normalized) ||
+                candidate.Settings.AutoStart != settings.AutoStart ||
+                candidate.Settings.MinuteDisplay != settings.MinuteDisplay ||
+                candidate.Settings.TopMost != settings.TopMost;
+
+            if (!changed && !force)
+            {
+                return Task.FromResult(true);
+            }
+
+            candidate.Draft = normalized;
+            candidate.Settings = settings.Clone();
+            Current = candidate;
+
+            var previousSave = _pendingSave;
+            var pending = Task.Run(async () =>
+            {
+                await previousSave.ConfigureAwait(false);
+                return Persist(candidate, previous);
+            });
+            _pendingSave = pending;
+            return pending;
+        }
+    }
 
     public bool EditHistory(Guid id, HistoryEntry edited, DateTimeOffset nowUtc) => Commit(candidate =>
     {
@@ -250,24 +287,66 @@ internal sealed class TimerEngine
             .ToList();
     }
 
-    private bool Commit(Func<AppState, bool> mutate)
+    private bool Commit(Func<AppState, bool> mutate, bool cloneHistory = true)
     {
-        LastError = null;
-        var candidate = Current.Clone();
-        if (!mutate(candidate))
+        FlushPendingSave();
+        lock (_sync)
         {
-            return true;
-        }
+            LastError = null;
+            var candidate = Current.Clone(cloneHistory);
+            if (!mutate(candidate))
+            {
+                return true;
+            }
 
+            try
+            {
+                _store.Save(candidate);
+                Current = candidate;
+                return true;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                LastError = ex.Message;
+                return false;
+            }
+        }
+    }
+
+    private void FlushPendingSave()
+    {
+        Task<bool> pending;
+        lock (_sync)
+        {
+            pending = _pendingSave;
+        }
+        pending.GetAwaiter().GetResult();
+    }
+
+    private bool Persist(AppState candidate, AppState previous)
+    {
         try
         {
             _store.Save(candidate);
-            Current = candidate;
+            lock (_sync)
+            {
+                if (ReferenceEquals(Current, candidate))
+                {
+                    LastError = null;
+                }
+            }
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            LastError = ex.Message;
+            lock (_sync)
+            {
+                if (ReferenceEquals(Current, candidate))
+                {
+                    Current = previous;
+                }
+                LastError = ex.Message;
+            }
             return false;
         }
     }

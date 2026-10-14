@@ -9,14 +9,14 @@ internal sealed class AppState
     public Guid? ActiveHistoryId { get; set; }
     public List<HistoryEntry> History { get; set; } = [];
 
-    public AppState Clone() => new()
+    public AppState Clone(bool cloneHistory = true) => new()
     {
         SchemaVersion = SchemaVersion,
         Timer = Timer.Clone(),
         Draft = Draft.Clone(),
         Settings = Settings.Clone(),
         ActiveHistoryId = ActiveHistoryId,
-        History = History.Select(x => x.Clone()).ToList()
+        History = cloneHistory ? History.Select(x => x.Clone()).ToList() : History
     };
 
     public static AppState CreateDefault() => new();

@@ -33,6 +33,20 @@ internal sealed class MainForm : Form
     private bool _processing;
     private bool _refreshing;
     private bool _draftDirty;
+    private int _draftRevision;
+    private HistoryRenderSnapshot[]? _renderedHistory;
+    private bool _renderedMinuteDisplay;
+
+    private readonly record struct HistoryRenderSnapshot(
+        Guid Id,
+        string TaskNumber,
+        string DevNumber,
+        string JobName,
+        string Memo,
+        long ElapsedMilliseconds,
+        DateTimeOffset CreatedAtUtc,
+        DateTimeOffset LastModifiedUtc,
+        bool Completed);
 
     public MainForm(TimerEngine engine, Icon icon)
     {
@@ -253,10 +267,10 @@ internal sealed class MainForm : Form
     private void WireEvents()
     {
         _displayTimer.Tick += (_, _) => RefreshTimer();
-        _draftTimer.Tick += (_, _) =>
+        _draftTimer.Tick += async (_, _) =>
         {
             _draftTimer.Stop();
-            SaveDraft(showError: true);
+            await SaveDraftAsync(showError: true);
         };
         foreach (var control in new Control[] { _taskText, _devText, _jobText, _memoText })
         {
@@ -317,6 +331,7 @@ internal sealed class MainForm : Form
             return;
         }
         _draftDirty = true;
+        _draftRevision++;
         _draftTimer.Stop();
         _draftTimer.Start();
     }
@@ -338,6 +353,32 @@ internal sealed class MainForm : Form
             ShowSaveError();
         }
         return ok;
+    }
+
+    private async Task SaveDraftAsync(bool showError)
+    {
+        if (!_draftDirty)
+        {
+            return;
+        }
+
+        var revision = _draftRevision;
+        var ok = await _engine.SaveDraftAsync(ReadDraft(), ReadSettings());
+        if (ok && revision == _draftRevision)
+        {
+            _draftDirty = false;
+        }
+        else if (!ok)
+        {
+            if (revision == _draftRevision)
+            {
+                _draftDirty = true;
+            }
+            if (showError)
+            {
+                ShowSaveError();
+            }
+        }
     }
 
     private bool RunCommand(Func<bool> command, bool includeDraft = false)
@@ -426,6 +467,27 @@ internal sealed class MainForm : Form
             _selectedHistoryId = null;
         }
 
+        var orderedHistory = _engine.OrderedHistory();
+        var snapshot = orderedHistory
+            .Select(entry => new HistoryRenderSnapshot(
+                entry.Id,
+                entry.TaskNumber,
+                entry.DevNumber,
+                entry.JobName,
+                entry.Memo,
+                entry.ElapsedMilliseconds,
+                entry.CreatedAtUtc,
+                entry.LastModifiedUtc,
+                entry.Completed))
+            .ToArray();
+        if (_renderedHistory is not null &&
+            _renderedMinuteDisplay == _minuteDisplayCheck.Checked &&
+            _renderedHistory.SequenceEqual(snapshot))
+        {
+            UpdateHistorySelection();
+            return;
+        }
+
         _historyList.SuspendLayout();
         try
         {
@@ -436,7 +498,7 @@ internal sealed class MainForm : Form
             _historyList.RowStyles.Clear();
             _historyList.RowCount = 0;
             DateOnly? lastDate = null;
-            foreach (var entry in _engine.OrderedHistory())
+            foreach (var entry in orderedHistory)
             {
                 var entryDate = DateOnly.FromDateTime(entry.CreatedAtUtc.LocalDateTime);
                 if (lastDate != entryDate)
@@ -458,6 +520,8 @@ internal sealed class MainForm : Form
         {
             _historyList.ResumeLayout(true);
         }
+        _renderedHistory = snapshot;
+        _renderedMinuteDisplay = _minuteDisplayCheck.Checked;
         UpdateHistorySelection();
     }
 
@@ -635,13 +699,18 @@ internal sealed class MainForm : Form
 
     private void UpdateHistorySelection()
     {
+        var historyById = new Dictionary<Guid, HistoryEntry>();
+        foreach (var entry in _engine.Current.History)
+        {
+            historyById.TryAdd(entry.Id, entry);
+        }
         foreach (var card in _historyList.Controls.OfType<RoundedPanel>())
         {
             if (card.Tag is not Guid id)
             {
                 continue;
             }
-            var entry = _engine.Current.History.FirstOrDefault(x => x.Id == id);
+            historyById.TryGetValue(id, out var entry);
             if (_selectedHistoryId == id)
             {
                 card.BackColor = Color.FromArgb(222, 237, 247);
